@@ -1,17 +1,23 @@
-import './App.css';
-// import 'antd/dist/antd.css';
-import { Button, Flex } from 'antd';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import Homepage from './pages/Homepage';
+import Items from './pages/Items';
 
 function App() {
   return (
     <>
-      <div>
-        <h1>Hey POS Applications</h1>
-        <Flex
-          gap='small'
-          wrap>
-          <Button type='gost'>Primary Button</Button>
-        </Flex>
+      <div className=''>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path='/home'
+              element={<Homepage />}
+            />
+            <Route
+              path='/items'
+              element={<Items />}
+            />
+          </Routes>
+        </BrowserRouter>
       </div>
     </>
   );

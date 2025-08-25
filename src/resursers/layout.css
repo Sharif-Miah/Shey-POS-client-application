@@ -1,0 +1,29 @@
+.site-layout .site-layout-background{
+    background: #fff;
+    box-shadow: 0 0 3px #ccc;
+    border-radius: 5px;
+}
+
+.ant-layout-has-sider{
+    padding: 15px !important;
+}
+
+.ant-layout-sider{
+    border-radius: 10px !important;
+    padding: 15px;
+    height: 95vh;
+}
+.ant-layout-header{
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin: 0 10px !important;
+}
+.anticon svg{
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+}
+.ant-menu-title-content a{
+    text-decoration: none !important;
+}
