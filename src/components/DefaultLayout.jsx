@@ -2,9 +2,11 @@ import { useState } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
+  HomeOutlined,
+  CopyOutlined,
+  UnorderedListOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  LoginOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
 import '../resursers/layout.css';
@@ -22,15 +24,18 @@ const DefaultLaout = ({ children }) => {
         trigger={null}
         collapsible
         collapsed={collapsed}>
-        <div className='demo-logo-vertical' />
+        <div className='demo-logo-vertical'>
+          {' '}
+          <h3>Shey POS</h3>{' '}
+        </div>
         <Menu
           theme='dark'
           mode='inline'
-          defaultSelectedKeys={['/home']}
+          defaultSelectedKeys={window.location.pathname}
           items={[
             {
               key: '/home',
-              icon: <UserOutlined />,
+              icon: <HomeOutlined />,
               label: (
                 <Link
                   className=''
@@ -41,7 +46,7 @@ const DefaultLaout = ({ children }) => {
             },
             {
               key: '/bills',
-              icon: <VideoCameraOutlined />,
+              icon: <CopyOutlined />,
               label: (
                 <Link
                   className=''
@@ -52,7 +57,7 @@ const DefaultLaout = ({ children }) => {
             },
             {
               key: '/items',
-              icon: <UploadOutlined />,
+              icon: <UnorderedListOutlined />,
               label: (
                 <Link
                   className=''
@@ -63,7 +68,7 @@ const DefaultLaout = ({ children }) => {
             },
             {
               key: '/customers',
-              icon: <UploadOutlined />,
+              icon: <UserOutlined />,
               label: (
                 <Link
                   className=''
@@ -74,7 +79,7 @@ const DefaultLaout = ({ children }) => {
             },
             {
               key: '/logout',
-              icon: <UploadOutlined />,
+              icon: <LoginOutlined />,
               label: (
                 <Link
                   className=''

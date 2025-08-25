@@ -10,9 +10,16 @@
 
 .ant-layout-sider{
     border-radius: 10px !important;
-    padding: 15px;
+     padding: 15px !important;
     height: 95vh;
 }
+.ant-layout-sider-children{
+  border-radius: 10px !important;
+  padding-top: 15px;
+  padding-right: 20px;
+
+}
+
 .ant-layout-header{
     display: flex;
     align-items: center;
@@ -26,4 +33,18 @@
 }
 .ant-menu-title-content a{
     text-decoration: none !important;
+}
+.demo-logo-vertical h3{
+    color: #0887ad;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 60px;
+}
+
+
+
+.ant-menu-item-selected{
+  background-color: #047979 !important;
+  
 }
