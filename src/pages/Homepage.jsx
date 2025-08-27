@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import DefaultLaout from '../components/DefaultLayout';
 import Items from '../components/items';
+import '../resursers/item.css';
 import { Col, Row } from 'antd';
 
 const Homepage = () => {
@@ -17,14 +18,17 @@ const Homepage = () => {
       });
   }, []);
 
-  console.log(itemsData);
-
   return (
     <DefaultLaout>
-      <Row>
+      <Row gutter={6}>
         {itemsData?.map((item) => {
           return (
-            <Col span={6}>
+            <Col
+              key={item._id}
+              xs={24}
+              lg={6}
+              md={12}
+              sm={6}>
               <Items item={item} />
             </Col>
           );
