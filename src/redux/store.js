@@ -6,11 +6,13 @@ const finalReducer = combineReducers({
 });
 
 const initialState = {
-  rootReducer: localStorage.getItem('cartItems')
-    ? JSON.parse(localStorage.getItem('cartItems'))
-    : [],
+  rootReducer: {
+    cartItems: localStorage.getItem('cartItems')
+      ? JSON.parse(localStorage.getItem('cartItems'))
+      : [],
+  },
 };
 
-const store = createStore(initialState, finalReducer);
+let store = createStore(finalReducer, initialState);
 
 export default store;

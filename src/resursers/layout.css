@@ -25,6 +25,7 @@
     align-items: center;
     border-radius: 5px;
     margin: 0 10px !important;
+    justify-content: space-between;
 }
 .anticon svg{
     height: 20px;
