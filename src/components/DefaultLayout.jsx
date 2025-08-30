@@ -14,10 +14,11 @@ import '../resursers/layout.css';
 import { Link, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 const { Header, Sider, Content } = Layout;
+import { PuffLoader } from 'react-spinners';
 
 const DefaultLaout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const { cartItems } = useSelector((state) => state.rootReducer);
+  const { cartItems, loading } = useSelector((state) => state.rootReducer);
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -29,6 +30,11 @@ const DefaultLaout = ({ children }) => {
 
   return (
     <Layout>
+      {loading && (
+        <div className='spiner'>
+          <PuffLoader color='#21e5df' />
+        </div>
+      )}
       <Sider
         trigger={null}
         collapsible

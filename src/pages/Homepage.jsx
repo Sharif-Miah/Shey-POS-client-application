@@ -1,19 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import DefaultLaout from '../components/DefaultLayout';
-import Items from '../components/items';
 import '../resursers/item.css';
 import { Col, Row } from 'antd';
+import Items from '../components/Items';
+import { useDispatch } from 'react-redux';
 
 const Homepage = () => {
   const [itemsData, setItemsdata] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch({ type: 'showLoading' });
     fetch('http://localhost:3000/api/items/get-all-items')
       .then((res) => res.json())
       .then((result) => {
+        dispatch({ type: 'hideLoading' });
         setItemsdata(result);
       })
       .catch((err) => {
+        dispatch({ type: 'hideLoading' });
         console.log(err);
       });
   }, []);
