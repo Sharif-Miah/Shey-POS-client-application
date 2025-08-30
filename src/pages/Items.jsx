@@ -3,18 +3,29 @@
 import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
-import { Button, Col, Modal, Row, Table } from 'antd';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Table,
+} from 'antd';
 import Items from '../components/Items';
 import { useDispatch } from 'react-redux';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 const ItemsPage = () => {
   const [itemsData, setItemsdata] = useState(null);
   const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
+  const [item, setItem] = useState(null);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch({ type: 'showLoading' });
+  const data = () => {
     fetch('http://localhost:3000/api/items/get-all-items')
       .then((res) => res.json())
       .then((result) => {
@@ -23,8 +34,14 @@ const ItemsPage = () => {
       })
       .catch((err) => {
         dispatch({ type: 'hideLoading' });
+
         console.log(err);
       });
+  };
+
+  useEffect(() => {
+    dispatch({ type: 'showLoading' });
+    data();
   }, []);
 
   const column = [
@@ -64,6 +81,25 @@ const ItemsPage = () => {
     },
   ];
 
+  const onFinish = async (value) => {
+    dispatch({ type: 'showLoading' });
+    try {
+      const response = fetch('http://localhost:3000/api/items/add-item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(value),
+      });
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const result = await response.json();
+    } catch (error) {
+      console.error('Fetch error:', error.message);
+    }
+  };
+
   return (
     <DefaultLaout>
       <div className='d-flex justify-content-between'>
@@ -81,12 +117,44 @@ const ItemsPage = () => {
       />
       <Modal
         visible={addEditModalVisibility}
+        onCancel={() => setAddEditModalVisibility(false)}
         title='Add New Item'
         footer={false}>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem,
-        doloremque. Rem, iste quisquam alias incidunt, corrupti suscipit nostrum
-        eligendi itaque a necessitatibus aperiam aliquid quidem! Aut quaerat
-        molestiae dolore ab.
+        <Form
+          layout='vertical'
+          onFinish={onFinish}>
+          <Form.Item
+            name={'name'}
+            label='Name'>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={'price'}
+            label='Price'>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={'image'}
+            label='ImageUrl'>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name='category'
+            label='Category'>
+            <Select>
+              <Select.Option value='vegetables'> Vegetables</Select.Option>
+              <Select.Option value='fruits'>Fruits</Select.Option>
+              <Select.Option value='meat'>Meat</Select.Option>
+            </Select>
+          </Form.Item>
+          <div className='d-flex justify-content-end'>
+            <Button
+              htmlType='submit'
+              type='primary'>
+              Save
+            </Button>
+          </div>
+        </Form>
       </Modal>
     </DefaultLaout>
   );
