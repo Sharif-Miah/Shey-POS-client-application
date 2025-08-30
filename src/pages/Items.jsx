@@ -84,17 +84,19 @@ const ItemsPage = () => {
   const onFinish = async (value) => {
     dispatch({ type: 'showLoading' });
     try {
-      const response = fetch('http://localhost:3000/api/items/add-item', {
+      const response = await fetch('http://localhost:3000/api/items/add-item', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(value),
       });
+
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }
-      const result = await response.json();
+
+      setAddEditModalVisibility(false);
     } catch (error) {
       console.error('Fetch error:', error.message);
     }
