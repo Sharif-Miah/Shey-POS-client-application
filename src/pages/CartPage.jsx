@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useDispatch, useSelector } from 'react-redux';
 import DefaultLaout from '../components/DefaultLayout';
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import {
   DeleteOutlined,
   PlusCircleOutlined,

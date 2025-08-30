@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
-import { Col, Row, Table } from 'antd';
+import { Button, Col, Modal, Row, Table } from 'antd';
 import Items from '../components/Items';
 import { useDispatch } from 'react-redux';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const ItemsPage = () => {
   const [itemsData, setItemsdata] = useState(null);
+  const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -64,12 +66,28 @@ const ItemsPage = () => {
 
   return (
     <DefaultLaout>
-      <h3>Items</h3>
+      <div className='d-flex justify-content-between'>
+        <h4 className='my-6'>Items</h4>
+        <Button
+          type='primary'
+          onClick={() => setAddEditModalVisibility(true)}>
+          Add Item
+        </Button>
+      </div>
       <Table
         columns={column}
         dataSource={itemsData}
         direction=''
       />
+      <Modal
+        visible={addEditModalVisibility}
+        title='Add New Item'
+        footer={false}>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem,
+        doloremque. Rem, iste quisquam alias incidunt, corrupti suscipit nostrum
+        eligendi itaque a necessitatibus aperiam aliquid quidem! Aut quaerat
+        molestiae dolore ab.
+      </Modal>
     </DefaultLaout>
   );
 };
