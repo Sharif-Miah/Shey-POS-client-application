@@ -3,26 +3,15 @@
 import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  message,
-  Modal,
-  Row,
-  Select,
-  Table,
-} from 'antd';
-import Items from '../components/Items';
+import { Button, Form, Input, message, Modal, Select, Table } from 'antd';
+
 import { useDispatch } from 'react-redux';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import axios from 'axios';
 
 const ItemsPage = () => {
   const [itemsData, setItemsdata] = useState(null);
   const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
-  const [item, setItem] = useState(null);
+
   const dispatch = useDispatch();
 
   const data = () => {
@@ -84,19 +73,23 @@ const ItemsPage = () => {
   const onFinish = async (value) => {
     dispatch({ type: 'showLoading' });
     try {
-      const response = fetch('http://localhost:3000/api/items/add-item', {
+      const response = await fetch('http://localhost:3000/api/items/add-item', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(value),
       });
+      message.success('Item successfully Added!');
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }
-      const result = await response.json();
+
+      setAddEditModalVisibility(false);
+      data();
     } catch (error) {
       console.error('Fetch error:', error.message);
+      message.error('Something went wrong!');
     }
   };
 
