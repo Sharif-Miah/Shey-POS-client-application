@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import Homepage from './pages/Homepage';
 import Items from './pages/Items';
+import CartPage from './pages/CartPage';
 
 function App() {
   return (
@@ -15,6 +16,10 @@ function App() {
             <Route
               path='/items'
               element={<Items />}
+            />
+            <Route
+              path='/cart'
+              element={<CartPage />}
             />
           </Routes>
         </BrowserRouter>
