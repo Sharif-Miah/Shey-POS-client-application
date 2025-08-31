@@ -12,10 +12,10 @@ const ItemsPage = () => {
   const [itemsData, setItemsdata] = useState(null);
   const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-
   const dispatch = useDispatch();
 
-  const data = () => {
+  const showAllItems = () => {
+    dispatch({ type: 'showLoading' });
     fetch('http://localhost:3000/api/items/get-all-items')
       .then((res) => res.json())
       .then((result) => {
@@ -48,7 +48,7 @@ const ItemsPage = () => {
       const notify = () => toast.success('Item Deleted Successfully!');
       notify();
       setAddEditModalVisibility(false);
-      data();
+      showAllItems();
     } catch (error) {
       console.error('Fetch error:', error.message);
       const notify = () => toast.error('Something went Wrong!');
@@ -57,8 +57,7 @@ const ItemsPage = () => {
   };
 
   useEffect(() => {
-    dispatch({ type: 'showLoading' });
-    data();
+    showAllItems();
   }, []);
 
   const column = [
@@ -128,7 +127,7 @@ const ItemsPage = () => {
         const notify = () => toast.success('Item Added Successfully!');
         notify();
         setAddEditModalVisibility(false);
-        data();
+        showAllItems();
       } catch (error) {
         console.error('Fetch error:', error.message);
         message.error('Something went wrong!');
@@ -152,7 +151,7 @@ const ItemsPage = () => {
         const notify = () => toast.success('Item Edited Successfully!');
         notify();
         setAddEditModalVisibility(false);
-        data();
+        showAllItems();
       } catch (error) {
         console.error('Fetch error:', error.message);
         message.error('Something went wrong!');
