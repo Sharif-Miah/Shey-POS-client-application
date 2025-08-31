@@ -4,13 +4,14 @@ import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
 import { Button, Form, Input, message, Modal, Select, Table } from 'antd';
-
 import { useDispatch } from 'react-redux';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { toast } from 'react-toastify';
 
 const ItemsPage = () => {
   const [itemsData, setItemsdata] = useState(null);
   const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -63,8 +64,14 @@ const ItemsPage = () => {
       dataIndex: '_id',
       render: (_id, record) => (
         <div className='flex'>
+          <EditOutlined
+            className='mx-2'
+            onClick={() => {
+              setEditingItem(record);
+              setAddEditModalVisibility(true);
+            }}
+          />
           <DeleteOutlined className='mx-2' />
-          <EditOutlined className='mx-2' />
         </div>
       ),
     },
@@ -72,24 +79,54 @@ const ItemsPage = () => {
 
   const onFinish = async (value) => {
     dispatch({ type: 'showLoading' });
-    try {
-      const response = await fetch('http://localhost:3000/api/items/add-item', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(value),
-      });
-      message.success('Item successfully Added!');
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
+    if (editingItem === null) {
+      try {
+        const response = await fetch(
+          'http://localhost:3000/api/items/add-item',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(value),
+          }
+        );
 
-      setAddEditModalVisibility(false);
-      data();
-    } catch (error) {
-      console.error('Fetch error:', error.message);
-      message.error('Something went wrong!');
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        const notify = () => toast.success('Item Added Successfully!');
+        notify();
+        setAddEditModalVisibility(false);
+        data();
+      } catch (error) {
+        console.error('Fetch error:', error.message);
+        message.error('Something went wrong!');
+      }
+    } else {
+      try {
+        const response = await fetch(
+          'http://localhost:3000/api/items/edit-item',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...value, itemId: editingItem._id }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        const notify = () => toast.success('Item Edited Successfully!');
+        notify();
+        setAddEditModalVisibility(false);
+        data();
+      } catch (error) {
+        console.error('Fetch error:', error.message);
+        message.error('Something went wrong!');
+      }
     }
   };
 
@@ -108,47 +145,53 @@ const ItemsPage = () => {
         dataSource={itemsData}
         direction=''
       />
-      <Modal
-        visible={addEditModalVisibility}
-        onCancel={() => setAddEditModalVisibility(false)}
-        title='Add New Item'
-        footer={false}>
-        <Form
-          layout='vertical'
-          onFinish={onFinish}>
-          <Form.Item
-            name={'name'}
-            label='Name'>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name={'price'}
-            label='Price'>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name={'image'}
-            label='ImageUrl'>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name='category'
-            label='Category'>
-            <Select>
-              <Select.Option value='vegetables'> Vegetables</Select.Option>
-              <Select.Option value='fruits'>Fruits</Select.Option>
-              <Select.Option value='meat'>Meat</Select.Option>
-            </Select>
-          </Form.Item>
-          <div className='d-flex justify-content-end'>
-            <Button
-              htmlType='submit'
-              type='primary'>
-              Save
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+      {addEditModalVisibility && (
+        <Modal
+          visible={addEditModalVisibility}
+          onCancel={() => {
+            setEditingItem(null);
+            setAddEditModalVisibility(false);
+          }}
+          title={`${editingItem !== null ? `Edit Item` : `Add New Item`}`}
+          footer={false}>
+          <Form
+            initialValues={editingItem}
+            layout='vertical'
+            onFinish={onFinish}>
+            <Form.Item
+              name={'name'}
+              label='Name'>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name={'price'}
+              label='Price'>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name={'image'}
+              label='ImageUrl'>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name='category'
+              label='Category'>
+              <Select>
+                <Select.Option value='vegetables'> Vegetables</Select.Option>
+                <Select.Option value='fruits'>Fruits</Select.Option>
+                <Select.Option value='meat'>Meat</Select.Option>
+              </Select>
+            </Form.Item>
+            <div className='d-flex justify-content-end'>
+              <Button
+                htmlType='submit'
+                type='primary'>
+                Save
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+      )}
     </DefaultLaout>
   );
 };
