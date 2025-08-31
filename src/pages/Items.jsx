@@ -29,6 +29,33 @@ const ItemsPage = () => {
       });
   };
 
+  const deleteItem = async (record) => {
+    try {
+      const response = await fetch(
+        'http://localhost:3000/api/items/delete-item',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ itemId: record._id }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const notify = () => toast.success('Item Deleted Successfully!');
+      notify();
+      setAddEditModalVisibility(false);
+      data();
+    } catch (error) {
+      console.error('Fetch error:', error.message);
+      const notify = () => toast.error('Something went Wrong!');
+      notify();
+    }
+  };
+
   useEffect(() => {
     dispatch({ type: 'showLoading' });
     data();
@@ -71,7 +98,10 @@ const ItemsPage = () => {
               setAddEditModalVisibility(true);
             }}
           />
-          <DeleteOutlined className='mx-2' />
+          <DeleteOutlined
+            className='mx-2'
+            onClick={() => deleteItem(record)}
+          />
         </div>
       ),
     },
