@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router';
 import Homepage from './pages/Homepage';
 import Items from './pages/Items';
 import CartPage from './pages/CartPage';
+import Login from './pages/auth/login';
+import Register from './pages/auth/Register';
 
 function App() {
   return (
@@ -20,6 +22,14 @@ function App() {
             <Route
               path='/cart'
               element={<CartPage />}
+            />
+            <Route
+              path='/login'
+              element={<Login />}
+            />
+            <Route
+              path='/register'
+              element={<Register />}
             />
           </Routes>
         </BrowserRouter>
