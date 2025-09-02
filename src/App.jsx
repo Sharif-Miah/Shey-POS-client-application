@@ -43,6 +43,10 @@ function App() {
               path='/register'
               element={<Register />}
             />
+            <Route
+              path='/'
+              element={<Login />}
+            />
           </Routes>
         </BrowserRouter>
       </div>

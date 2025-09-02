@@ -97,8 +97,10 @@ const DefaultLaout = ({ children }) => {
               icon: <LoginOutlined />,
               label: (
                 <Link
-                  className=''
-                  to={'/logout'}>
+                  onClick={() => {
+                    localStorage.removeItem('pos-user');
+                  }}
+                  to={'/login'}>
                   Logout
                 </Link>
               ),
