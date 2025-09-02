@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd';
 import { Button, Form, Input } from 'antd';
 import '../../resursers/authentication.css';
+import { Link } from 'react-router';
 
 const Register = () => {
   const onFinish = (value) => {
@@ -16,6 +17,11 @@ const Register = () => {
           <Form
             layout='vertical'
             onFinish={onFinish}>
+            <h1>
+              <b>SHEY POS</b>
+            </h1>
+            <hr />
+            <h3 className='text-center'>Register</h3>
             <Form.Item
               name={'name'}
               label='Name'>
@@ -37,6 +43,16 @@ const Register = () => {
                 type='primary'>
                 Register
               </Button>
+            </div>
+            <div className='px-5'>
+              <span>
+                Already Registed ? Click here to{' '}
+                <Link
+                  to='/login'
+                  className='text-decoration-none'>
+                  Login
+                </Link>
+              </span>
             </div>
           </Form>
         </Col>
