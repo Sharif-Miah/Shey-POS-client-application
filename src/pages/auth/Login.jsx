@@ -1,11 +1,30 @@
+/* eslint-disable no-unused-vars */
 import { Col, Row } from 'antd';
 import { Button, Form, Input } from 'antd';
 import '../../resursers/authentication.css';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Login = () => {
-  const onFinish = (value) => {
-    console.log(value);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const onFinish = (values) => {
+    dispatch({ type: 'showLoading' });
+    axios
+      .post('http://localhost:3000/api/users/login', values)
+      .then((res) => {
+        dispatch({ type: 'hideLoading' });
+        const notify = () => toast.success('Item Edited Successfully!');
+        notify();
+        navigate('/home');
+      })
+      .catch(() => {
+        dispatch({ type: 'hideLoading' });
+        const notify = () => toast.error('Something went wrong');
+        notify();
+      });
   };
 
   return (
