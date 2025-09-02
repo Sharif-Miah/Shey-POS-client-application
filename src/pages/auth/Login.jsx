@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Col, Row } from 'antd';
 import { Button, Form, Input } from 'antd';
 import '../../resursers/authentication.css';
@@ -16,9 +15,11 @@ const Login = () => {
       .post('http://localhost:3000/api/users/login', values)
       .then((res) => {
         dispatch({ type: 'hideLoading' });
-        const notify = () => toast.success('Item Edited Successfully!');
+        const notify = () => toast.success('Login Successfully!');
         notify();
         navigate('/home');
+        localStorage.setItem('pos-user', JSON.stringify(res.data));
+        console.log(res.data);
       })
       .catch(() => {
         dispatch({ type: 'hideLoading' });

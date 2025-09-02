@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import Homepage from './pages/Homepage';
 import Items from './pages/Items';
 import CartPage from './pages/CartPage';
-import Login from './pages/auth/login';
 import Register from './pages/auth/Register';
+import Login from './pages/auth/Login';
 
 function App() {
   return (
@@ -13,15 +13,27 @@ function App() {
           <Routes>
             <Route
               path='/home'
-              element={<Homepage />}
+              element={
+                <ProtectedRoute>
+                  <Homepage />
+                </ProtectedRoute>
+              }
             />
             <Route
               path='/items'
-              element={<Items />}
+              element={
+                <ProtectedRoute>
+                  <Items />
+                </ProtectedRoute>
+              }
             />
             <Route
               path='/cart'
-              element={<CartPage />}
+              element={
+                <ProtectedRoute>
+                  <CartPage />
+                </ProtectedRoute>
+              }
             />
             <Route
               path='/login'
@@ -39,3 +51,11 @@ function App() {
 }
 
 export default App;
+
+export function ProtectedRoute({ children }) {
+  if (localStorage.getItem('pos-user')) {
+    return children;
+  } else {
+    return <Navigate to='/login' />;
+  }
+}
