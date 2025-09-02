@@ -23,7 +23,7 @@ const Login = () => {
             <hr />
             <h3 className='text-center'>Login</h3>
             <Form.Item
-              name={'userid'}
+              name={'userId'}
               label='User Id'>
               <Input />
             </Form.Item>
@@ -44,7 +44,7 @@ const Login = () => {
                 Dont't Registed ? Click here to{' '}
                 <Link
                   to='/register'
-                  className='text-decoration-none'>
+                  className='text-decoration-none text-primary'>
                   Register
                 </Link>
               </span>
