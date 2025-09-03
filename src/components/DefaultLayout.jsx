@@ -60,6 +60,17 @@ const DefaultLaout = ({ children }) => {
               ),
             },
             {
+              key: '/cart',
+              icon: <ShoppingCartOutlined />,
+              label: (
+                <Link
+                  className=''
+                  to={'/cart'}>
+                  Cart
+                </Link>
+              ),
+            },
+            {
               key: '/bills',
               icon: <CopyOutlined />,
               label: (
