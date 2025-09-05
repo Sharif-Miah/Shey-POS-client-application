@@ -94,9 +94,11 @@ const CartPage = () => {
       subTotal,
       Tax: Number(((subTotal / 100) * 10).toFixed(2)),
       totalAmount: Number((subTotal + (subTotal / 100) * 10).toFixed(2)),
+      userId: JSON.parse(localStorage.getItem('pos-user'))._id,
     };
-    const userId = JSON.parse(localStorage.getItem('pos-user'));
-    console.log(reqObject, userId._id);
+
+    console.log(reqObject);
+    console.log(localStorage.getItem('pos-user')._id);
   };
 
   return (

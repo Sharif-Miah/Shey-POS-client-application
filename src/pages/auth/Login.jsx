@@ -36,7 +36,7 @@ const Login = () => {
           xs={22}>
           <Form
             layout='vertical'
-            onFinish={onFinish}>
+            onFinish={(values) => onFinish(values)}>
             <h1>
               <b>SHEY POS</b>
             </h1>

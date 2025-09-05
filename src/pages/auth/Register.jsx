@@ -19,6 +19,7 @@ const Register = () => {
         const notify = () => toast.success('Registerd Successfully!');
         notify();
         navigate('/login');
+        console.log(res.data);
       })
       .catch(() => {
         dispatch({ type: 'hideLoading' });
