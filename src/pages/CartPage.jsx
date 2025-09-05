@@ -8,6 +8,8 @@ import {
   MinusCircleOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const CartPage = () => {
   const { cartItems } = useSelector((state) => state.rootReducer);
@@ -92,13 +94,21 @@ const CartPage = () => {
     const reqObject = {
       ...values,
       subTotal,
-      Tax: Number(((subTotal / 100) * 10).toFixed(2)),
+      cartItems,
+      tax: Number(((subTotal / 100) * 10).toFixed(2)),
       totalAmount: Number((subTotal + (subTotal / 100) * 10).toFixed(2)),
       userId: JSON.parse(localStorage.getItem('pos-user'))._id,
     };
-
-    console.log(reqObject);
-    console.log(localStorage.getItem('pos-user')._id);
+    axios
+      .post('http://localhost:3000/api/bill/charge-bill', reqObject)
+      .then(() => {
+        const notify = () => toast.success('bill charged Successfully!');
+        notify();
+      })
+      .catch(() => {
+        const notify = () => toast.error('Something went wrong');
+        notify();
+      });
   };
 
   return (

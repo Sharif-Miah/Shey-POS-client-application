@@ -17,9 +17,9 @@ const Login = () => {
         dispatch({ type: 'hideLoading' });
         const notify = () => toast.success('Login Successfully!');
         notify();
-        navigate('/home');
-        localStorage.setItem('pos-user', JSON.stringify(res.data));
         console.log(res.data);
+        localStorage.setItem('pos-user', JSON.stringify(res.data));
+        navigate('/home');
       })
       .catch(() => {
         dispatch({ type: 'hideLoading' });
