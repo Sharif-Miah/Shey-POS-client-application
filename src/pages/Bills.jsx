@@ -1,17 +1,15 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
-import { Button, Form, Input, message, Modal, Select, Table } from 'antd';
+import { Modal, Table } from 'antd';
 import { useDispatch } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
-import { toast } from 'react-toastify';
 
 const Bills = () => {
   const [billsData, setBillsData] = useState(null);
-  const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
+  const [printModalVisibility, setprintModalVisibility] = useState(false);
+  const [selectedBill, setSelectedBill] = useState(null);
   const dispatch = useDispatch();
 
   const getAllBills = () => {
@@ -28,10 +26,6 @@ const Bills = () => {
         console.log(err);
       });
   };
-
-  useEffect(() => {
-    getAllBills();
-  }, []);
 
   const column = [
     {
@@ -59,36 +53,120 @@ const Bills = () => {
       dataIndex: '_id',
       render: (_id, record) => (
         <div className='flex'>
-          <EyeOutlined className='mx-2' />
+          <EyeOutlined
+            className='mx-2'
+            onClick={() => {
+              setSelectedBill(record);
+              setprintModalVisibility(true);
+            }}
+          />
         </div>
       ),
     },
   ];
 
+  const cartColumn = [
+    {
+      title: 'name',
+      dataIndex: 'name',
+    },
+    {
+      title: 'price',
+      dataIndex: 'price',
+    },
+    {
+      title: 'Quantity',
+      dataIndex: '_id',
+      render: (id, record) => (
+        <div>
+          <b>{record.quantity}</b>
+        </div>
+      ),
+    },
+    {
+      title: 'Total Fare',
+      dataIndex: '_id',
+      render: (id, record) => (
+        <div>
+          <b>{record.quantity * record.price}</b>
+        </div>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    getAllBills();
+  }, []);
+
   return (
     <DefaultLaout>
       <div className='d-flex justify-content-between'>
         <h4 className='my-6'>Items</h4>
-        <Button
-          type='primary'
-          onClick={() => setAddEditModalVisibility(true)}>
-          Add Item
-        </Button>
       </div>
       <Table
         columns={column}
         dataSource={billsData}
         direction=''
       />
-      {addEditModalVisibility && (
+      {printModalVisibility && (
         <Modal
-          visible={addEditModalVisibility}
+          visible={printModalVisibility}
           onCancel={() => {
-            setEditingItem(null);
-            setAddEditModalVisibility(false);
+            setprintModalVisibility(false);
           }}
-          title={`${editingItem !== null ? `Edit Item` : `Add New Item`}`}
-          footer={false}></Modal>
+          title={`Bills Details`}
+          footer={false}
+          width={800}>
+          <div className='bill-model '>
+            <div className='d-flex justify-content-between bill-header pb-2'>
+              <div>
+                <h1>
+                  <b>Social Circle</b>
+                </h1>
+              </div>
+              <div>
+                <p>Narsingdi</p>
+                <p>Madhabdi, Amdiya-1603</p>
+                <p>+88 01906-562866</p>
+              </div>
+            </div>
+            <div className='bill-customer-details mt-2'>
+              <p>
+                <b>Name</b>: {selectedBill.customerName}
+              </p>
+              <p>
+                <b>Mobile Number</b>: {selectedBill.customerPhoneNumber}
+              </p>
+              <p>
+                <b>Date</b>:{' '}
+                {selectedBill.createdAt.toString().substring(0, 10)}
+              </p>
+            </div>
+            <Table
+              dataSource={selectedBill.cartItems}
+              columns={cartColumn}
+              pagination={false}
+            />
+            <div className='dotted-border mt-2 mb-2 pb-2'>
+              <p>
+                <b>Sub Total</b>: {selectedBill.subTotal}
+              </p>
+              <p>
+                <b>Tax</b>: {selectedBill.tax}
+              </p>
+            </div>
+            <div className='mt-2 mb-2 pb-2'>
+              <h2>
+                <b>Grand Total: {selectedBill.totalAmount}</b>
+              </h2>
+            </div>
+            <div className='dotted-border'></div>
+            <div className='text-center'>
+              <p>Thanks</p>
+              <p>Visite Again :) </p>
+            </div>
+          </div>
+        </Modal>
       )}
     </DefaultLaout>
   );

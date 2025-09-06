@@ -44,3 +44,19 @@
 .selected-category{
     border: 3px solid rgb(30, 38, 66);
 }
+
+/* --------- Bill stylle----------- */
+.bill-header{
+    border-bottom: 2px dotted gray;
+}
+.bill-model h1{
+    font-size: 30px;
+}
+.bill-model p{
+    margin-top: 0;
+    margin-bottom: 0!important;
+
+}
+.dotted-border{
+ border-bottom: 2px dotted gray;
+}
