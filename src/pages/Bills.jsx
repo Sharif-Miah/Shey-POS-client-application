@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import React, { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import DefaultLaout from '../components/DefaultLayout';
 import { useEffect, useState } from 'react';
 import '../resursers/item.css';
-import { Modal, Table } from 'antd';
+import { Button, Modal, Table } from 'antd';
 import { useDispatch } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
 
 const Bills = () => {
+  const componentRef = useRef();
   const [billsData, setBillsData] = useState(null);
   const [printModalVisibility, setprintModalVisibility] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
@@ -98,6 +101,10 @@ const Bills = () => {
     getAllBills();
   }, []);
 
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
   return (
     <DefaultLaout>
       <div className='d-flex justify-content-between'>
@@ -110,14 +117,16 @@ const Bills = () => {
       />
       {printModalVisibility && (
         <Modal
-          visible={printModalVisibility}
+          open={printModalVisibility}
           onCancel={() => {
             setprintModalVisibility(false);
           }}
           title={`Bills Details`}
           footer={false}
           width={800}>
-          <div className='bill-model '>
+          <div
+            ref={componentRef}
+            className='bill-model p-4'>
             <div className='d-flex justify-content-between bill-header pb-2'>
               <div>
                 <h1>
@@ -165,6 +174,13 @@ const Bills = () => {
               <p>Thanks</p>
               <p>Visite Again :) </p>
             </div>
+          </div>
+          <div className='d-flex justify-content-end'>
+            <Button
+              type='primary'
+              onClick={handlePrint}>
+              Print Bill
+            </Button>
           </div>
         </Modal>
       )}
