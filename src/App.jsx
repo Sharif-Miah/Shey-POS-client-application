@@ -4,6 +4,8 @@ import Items from './pages/Items';
 import CartPage from './pages/CartPage';
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
+import Bills from './pages/Bills';
+import Customers from './pages/Customers';
 
 function App() {
   return (
@@ -32,6 +34,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CartPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/bills'
+              element={
+                <ProtectedRoute>
+                  <Bills />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/customers'
+              element={
+                <ProtectedRoute>
+                  <Customers />
                 </ProtectedRoute>
               }
             />
