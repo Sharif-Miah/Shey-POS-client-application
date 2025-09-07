@@ -108,7 +108,7 @@ const Bills = () => {
   return (
     <DefaultLaout>
       <div className='d-flex justify-content-between py-4'>
-        <h4 className='my-6'>Items</h4>
+        <h4 className='my-6'>Bills</h4>
       </div>
       <Table
         columns={column}
