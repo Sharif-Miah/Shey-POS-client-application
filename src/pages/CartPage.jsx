@@ -10,12 +10,14 @@ import {
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
 
 const CartPage = () => {
   const { cartItems } = useSelector((state) => state.rootReducer);
   const [subTotal, setSubtotal] = useState(0);
   const [billChargeModel, setBillChargeModel] = useState(false);
   const dispatch = useDispatch();
+  const Navigate = useNavigate();
 
   const increaseQuantity = (record) => {
     dispatch({
@@ -104,6 +106,7 @@ const CartPage = () => {
       .then(() => {
         const notify = () => toast.success('bill charged Successfully!');
         notify();
+        Navigate('/bills');
       })
       .catch(() => {
         const notify = () => toast.error('Something went wrong');

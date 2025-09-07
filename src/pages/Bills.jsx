@@ -21,7 +21,8 @@ const Bills = () => {
       .then((res) => res.json())
       .then((result) => {
         dispatch({ type: 'hideLoading' });
-        setBillsData(result);
+        const data = result.reverse();
+        setBillsData(data);
       })
       .catch((err) => {
         dispatch({ type: 'hideLoading' });
