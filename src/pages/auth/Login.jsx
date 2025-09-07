@@ -12,7 +12,7 @@ const Login = () => {
   const onFinish = (values) => {
     dispatch({ type: 'showLoading' });
     axios
-      .post('http://localhost:3000/api/users/login', values)
+      .post('https://shey-pos-server.vercel.app/api/users/login', values)
       .then((res) => {
         dispatch({ type: 'hideLoading' });
         const notify = () => toast.success('Login Successfully!');

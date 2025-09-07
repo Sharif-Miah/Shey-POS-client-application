@@ -102,7 +102,10 @@ const CartPage = () => {
       userId: JSON.parse(localStorage.getItem('pos-user'))._id,
     };
     axios
-      .post('http://localhost:3000/api/bill/charge-bill', reqObject)
+      .post(
+        'https://shey-pos-server.vercel.app/api/bill/charge-bill',
+        reqObject
+      )
       .then(() => {
         const notify = () => toast.success('bill charged Successfully!');
         notify();

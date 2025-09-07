@@ -41,7 +41,7 @@ const DefaultLaout = ({ children }) => {
         collapsed={collapsed}>
         <div className='demo-logo-vertical'>
           {' '}
-          <h3>Shey POS</h3>{' '}
+          <h3>{collapsed ? 'SP' : 'Shey POS'}</h3>{' '}
         </div>
         <Menu
           theme='dark'

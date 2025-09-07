@@ -16,7 +16,7 @@ const ItemsPage = () => {
 
   const showAllItems = () => {
     dispatch({ type: 'showLoading' });
-    fetch('http://localhost:3000/api/items/get-all-items')
+    fetch('https://shey-pos-server.vercel.app/api/items/get-all-items')
       .then((res) => res.json())
       .then((result) => {
         dispatch({ type: 'hideLoading' });
@@ -32,7 +32,7 @@ const ItemsPage = () => {
   const deleteItem = async (record) => {
     try {
       const response = await fetch(
-        'http://localhost:3000/api/items/delete-item',
+        'https://shey-pos-server.vercel.app/api/items/delete-item',
         {
           method: 'POST',
           headers: {
@@ -111,7 +111,7 @@ const ItemsPage = () => {
     if (editingItem === null) {
       try {
         const response = await fetch(
-          'http://localhost:3000/api/items/add-item',
+          'https://shey-pos-server.vercel.app/api/items/add-item',
           {
             method: 'POST',
             headers: {
@@ -135,7 +135,7 @@ const ItemsPage = () => {
     } else {
       try {
         const response = await fetch(
-          'http://localhost:3000/api/items/edit-item',
+          'https://shey-pos-server.vercel.app/api/items/edit-item',
           {
             method: 'POST',
             headers: {

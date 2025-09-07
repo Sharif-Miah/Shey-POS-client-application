@@ -13,7 +13,7 @@ const Register = () => {
   const onFinish = (values) => {
     dispatch({ type: 'showLoading' });
     axios
-      .post('http://localhost:3000/api/users/register', values)
+      .post('https://shey-pos-server.vercel.app/api/users/register', values)
       .then((res) => {
         dispatch({ type: 'hideLoading' });
         const notify = () => toast.success('Registerd Successfully!');

@@ -30,7 +30,7 @@ const Homepage = () => {
 
   useEffect(() => {
     dispatch({ type: 'showLoading' });
-    fetch('http://localhost:3000/api/items/get-all-items')
+    fetch('https://shey-pos-server.vercel.app/api/items/get-all-items')
       .then((res) => res.json())
       .then((result) => {
         dispatch({ type: 'hideLoading' });
@@ -44,7 +44,7 @@ const Homepage = () => {
 
   return (
     <DefaultLaout>
-      <div className='d-flex'>
+      <div className='d-flex categories'>
         {categories.map((category) => {
           return (
             <div
