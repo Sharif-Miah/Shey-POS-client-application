@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { EyeOutlined } from '@ant-design/icons';
 
 const Bills = () => {
-  const componentRef = useRef();
+  const componentRef = useRef(null);
   const [billsData, setBillsData] = useState(null);
   const [printModalVisibility, setprintModalVisibility] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
@@ -102,18 +102,16 @@ const Bills = () => {
   }, []);
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    contentRef: componentRef,
   });
-
   return (
     <DefaultLaout>
-      <div className='d-flex justify-content-between'>
+      <div className='d-flex justify-content-between py-4'>
         <h4 className='my-6'>Items</h4>
       </div>
       <Table
         columns={column}
         dataSource={billsData}
-        direction=''
       />
       {printModalVisibility && (
         <Modal
@@ -155,6 +153,7 @@ const Bills = () => {
               dataSource={selectedBill.cartItems}
               columns={cartColumn}
               pagination={false}
+              className='my-3'
             />
             <div className='dotted-border mt-2 mb-2 pb-2'>
               <p>
