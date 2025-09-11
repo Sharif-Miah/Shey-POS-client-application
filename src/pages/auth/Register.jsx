@@ -37,7 +37,7 @@ const Register = () => {
             layout='vertical'
             onFinish={onFinish}>
             <h1>
-              <b>SHEY POS</b>
+              <b>FreshPOS</b>
             </h1>
             <hr />
             <h3 className='text-center'>Register</h3>

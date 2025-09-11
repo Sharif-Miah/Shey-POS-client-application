@@ -38,7 +38,7 @@ const Login = () => {
             layout='vertical'
             onFinish={(values) => onFinish(values)}>
             <h1>
-              <b>SHEY POS</b>
+              <b>FreshPOS</b>
             </h1>
             <hr />
             <h3 className='text-center'>Login</h3>
