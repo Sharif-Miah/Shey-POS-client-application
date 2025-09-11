@@ -58,7 +58,7 @@ const Bills = () => {
       render: (_id, record) => (
         <div className='flex'>
           <EyeOutlined
-            className='mx-2'
+            className='mx-2 text-primary'
             onClick={() => {
               setSelectedBill(record);
               setprintModalVisibility(true);
@@ -129,7 +129,7 @@ const Bills = () => {
             <div className='d-flex justify-content-between bill-header pb-2'>
               <div>
                 <h1>
-                  <b>Social Circle</b>
+                  <b>FreshPOS</b>
                 </h1>
               </div>
               <div>
