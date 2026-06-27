@@ -30,7 +30,7 @@ const Homepage = () => {
 
   useEffect(() => {
     dispatch({ type: 'showLoading' });
-    fetch('https://shey-pos-server.vercel.app/api/items/get-all-items')
+    fetch('/api/items/get-all-items?t=' + Date.now())
       .then((res) => res.json())
       .then((result) => {
         dispatch({ type: 'hideLoading' });

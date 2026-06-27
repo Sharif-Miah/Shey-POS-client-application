@@ -12,7 +12,7 @@ const Customers = () => {
 
   const getAllBills = () => {
     dispatch({ type: 'showLoading' });
-    fetch('https://shey-pos-server.vercel.app/api/bill/get-all-bill')
+    fetch('/api/bill/get-all-bill')
       .then((res) => res.json())
       .then((result) => {
         dispatch({ type: 'hideLoading' });

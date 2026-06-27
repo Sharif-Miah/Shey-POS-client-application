@@ -103,7 +103,7 @@ const CartPage = () => {
     };
     axios
       .post(
-        'https://shey-pos-server.vercel.app/api/bill/charge-bill',
+        '/api/bill/charge-bill',
         reqObject
       )
       .then(() => {
