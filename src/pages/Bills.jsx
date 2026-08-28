@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import DefaultLayout from '../components/DefaultLayout';
 import '../resursers/item.css';
-import { Button, Modal, Table, Input, Tag } from 'antd';
+import { Button, Modal, Table, Input, Tag, QRCode } from 'antd';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -394,19 +394,44 @@ const Bills = () => {
               </div>
             </div>
 
+            {/* QR Code for Mobile Verification */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '16px',
+                paddingTop: '12px',
+                borderTop: '1px dashed #cbd5e1',
+              }}>
+              <QRCode
+                value={`${window.location.origin}/invoice/${selectedBill._id}`}
+                size={85}
+                bordered={false}
+              />
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  fontSize: '11px',
+                  color: '#64748b',
+                  fontWeight: '500',
+                }}>
+                Scan to view digital invoice on mobile
+              </p>
+            </div>
+
             <div
               style={{
                 textAlign: 'center',
-                marginTop: '24px',
-                paddingTop: '16px',
-                borderTop: '1px dashed #cbd5e1',
+                marginTop: '12px',
                 color: '#64748b',
-                fontSize: '13px',
+                fontSize: '12px',
               }}>
-              <p style={{ margin: 0, fontWeight: '600' }}>
+              <p style={{ margin: 0, fontWeight: '600', color: '#334155' }}>
                 Thank you for shopping with us!
               </p>
-              <p style={{ margin: '4px 0 0' }}>Please visit again 🙏</p>
+              <p style={{ margin: '4px 0 0' }}>Please visit again</p>
             </div>
           </div>
         </Modal>

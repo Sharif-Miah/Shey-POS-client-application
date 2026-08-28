@@ -6,6 +6,7 @@ import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import Bills from './pages/Bills';
 import Customers from './pages/Customers';
+import PublicInvoice from './pages/PublicInvoice';
 
 function App() {
   return (
@@ -52,6 +53,10 @@ function App() {
                   <Customers />
                 </ProtectedRoute>
               }
+            />
+            <Route
+              path='/invoice/:id'
+              element={<PublicInvoice />}
             />
             <Route
               path='/login'
