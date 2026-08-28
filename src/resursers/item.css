@@ -112,8 +112,13 @@
 }
 
 .category-all-icon {
-  font-size: 20px;
+  font-size: 22px;
   color: #1890ff;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .category-card.active .category-all-icon {

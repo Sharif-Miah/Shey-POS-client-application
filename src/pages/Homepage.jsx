@@ -107,13 +107,13 @@ const Homepage = () => {
               <div className='category-info'>
                 <span className='category-title'>{category.label}</span>
               </div>
-              <div className='category-image-wrap'>
-                {category.isAll ? (
-                  <AppstoreOutlined className='category-all-icon' />
-                ) : (
+              {category.imageUrl ? (
+                <div className='category-image-wrap'>
                   <img src={category.imageUrl} alt={category.label} />
-                )}
-              </div>
+                </div>
+              ) : (
+                <AppstoreOutlined className='category-all-icon' />
+              )}
             </div>
           );
         })}
