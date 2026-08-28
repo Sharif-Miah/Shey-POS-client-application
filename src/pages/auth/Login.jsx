@@ -88,7 +88,7 @@ const Login = () => {
         {/* Right Form Section */}
         <div className='auth-form-wrapper'>
           <div className='auth-form-header'>
-            <h2>Welcome Back! 👋</h2>
+            <h2>Welcome Back</h2>
             <p>Please enter your email and password to access POS.</p>
           </div>
 

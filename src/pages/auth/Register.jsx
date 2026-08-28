@@ -88,7 +88,7 @@ const Register = () => {
         {/* Right Form Section */}
         <div className='auth-form-wrapper'>
           <div className='auth-form-header'>
-            <h2>Create an Account ✨</h2>
+            <h2>Create an Account</h2>
             <p>Fill in your details below to register your POS account.</p>
           </div>
 

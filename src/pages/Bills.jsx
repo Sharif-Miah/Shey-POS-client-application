@@ -55,20 +55,20 @@ const Bills = () => {
             localStorage.removeItem('pending-stripe-bill');
             localStorage.removeItem('cartItems');
             dispatch({ type: 'emptyCart' });
-            toast.success('🎉 Stripe Payment Successful & Bill Generated!');
+            toast.success('Stripe Payment Successful & Bill Generated!');
             getAllBills();
           })
           .catch(() => {
             localStorage.removeItem('pending-stripe-bill');
             localStorage.removeItem('cartItems');
             dispatch({ type: 'emptyCart' });
-            toast.success('🎉 Payment Successful!');
+            toast.success('Payment Successful!');
             getAllBills();
           });
       } else {
         localStorage.removeItem('cartItems');
         dispatch({ type: 'emptyCart' });
-        toast.success('🎉 Payment Successful!');
+        toast.success('Payment Successful!');
         getAllBills();
       }
       window.history.replaceState({}, '', window.location.pathname);

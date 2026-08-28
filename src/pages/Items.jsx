@@ -289,7 +289,7 @@ const ItemsPage = () => {
         }}
         title={
           <div style={{ fontSize: '18px', fontWeight: '700' }}>
-            {editingItem !== null ? '✏️ Edit Product' : '✨ Add New Product'}
+            {editingItem !== null ? 'Edit Product' : 'Add New Product'}
           </div>
         }
         footer={false}
