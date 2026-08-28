@@ -26,6 +26,12 @@ export const rootReducer = (state = initialState, action) => {
             : item
         ),
       };
+    case 'emptyCart':
+    case 'clearCart':
+      return {
+        ...state,
+        cartItems: [],
+      };
     case 'showLoading':
       return {
         ...state,
