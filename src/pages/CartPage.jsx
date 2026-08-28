@@ -1,23 +1,48 @@
 /* eslint-disable no-unused-vars */
 import { useDispatch, useSelector } from 'react-redux';
-import DefaultLaout from '../components/DefaultLayout';
-import { Button, Form, Input, message, Modal, Select, Table } from 'antd';
+import DefaultLayout from '../components/DefaultLayout';
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Table,
+  Empty,
+  Popconfirm,
+  Tag,
+} from 'antd';
 import {
   DeleteOutlined,
-  PlusCircleOutlined,
-  MinusCircleOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  ShoppingCartOutlined,
+  CreditCardOutlined,
+  DollarCircleOutlined,
+  CheckCircleOutlined,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
+import '../resursers/item.css';
 
 const CartPage = () => {
   const { cartItems } = useSelector((state) => state.rootReducer);
   const [subTotal, setSubtotal] = useState(0);
   const [billChargeModel, setBillChargeModel] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const increaseQuantity = (record) => {
     dispatch({
@@ -27,166 +52,417 @@ const CartPage = () => {
   };
 
   const decreaseQuantity = (record) => {
-    if (record.quantity !== 1) {
+    if (record.quantity > 1) {
       dispatch({
         type: 'updatedCart',
         payload: { ...record, quantity: record.quantity - 1 },
       });
+    } else {
+      dispatch({ type: 'deleteFromCart', payload: record });
     }
   };
 
-  const column = [
-    {
-      title: 'name',
-      dataIndex: 'name',
-    },
-    {
-      title: 'image',
-      dataIndex: 'image',
-      render: (image, record) => (
-        <img
-          src={image}
-          alt=''
-          height={'60'}
-          width={'60'}
-        />
-      ),
-    },
-    {
-      title: 'price',
-      dataIndex: 'price',
-    },
-    {
-      title: 'Quantity',
-      dataIndex: '_id',
-      render: (id, record) => (
-        <div>
-          <PlusCircleOutlined
-            className='mx-3 mt-4'
-            onClick={() => increaseQuantity(record)}
-          />
-          <b>{record.quantity}</b>
-          <MinusCircleOutlined
-            className='mx-3 mt-4'
-            onClick={() => decreaseQuantity(record)}
-          />
-        </div>
-      ),
-    },
-    {
-      title: 'Action',
-      dataIndex: '_id',
-      render: (_id, record) => (
-        <DeleteOutlined
-          onClick={() => dispatch({ type: 'deleteFromCart', payload: record })}
-        />
-      ),
-    },
-  ];
-
   useEffect(() => {
     let temp = 0;
-    cartItems.forEach((item) => {
-      temp = temp + item.price * item.quantity;
+    (cartItems || []).forEach((item) => {
+      temp = temp + (Number(item.price) || 0) * (Number(item.quantity) || 1);
     });
     setSubtotal(temp);
   }, [cartItems]);
 
+  const tax = Number(((subTotal / 100) * 10).toFixed(2));
+  const grandTotal = Number((subTotal + tax).toFixed(2));
+
+  const desktopColumns = [
+    {
+      title: 'Product',
+      dataIndex: 'name',
+      render: (text, record) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img
+            src={
+              record.image ||
+              'https://images.unsplash.com/photo-1542838132-92c53300491e?w=100'
+            }
+            alt={text}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '8px',
+              objectFit: 'cover',
+              border: '1px solid #e2e8f0',
+            }}
+          />
+          <div>
+            <div style={{ fontWeight: '600', color: '#0f172a' }}>{text}</div>
+            {record.category && (
+              <Tag color='blue' style={{ fontSize: '11px', marginTop: '2px' }}>
+                {record.category}
+              </Tag>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Unit Price',
+      dataIndex: 'price',
+      render: (price) => (
+        <span style={{ fontWeight: '600', color: '#475569' }}>
+          ${Number(price).toFixed(2)}
+        </span>
+      ),
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      render: (_, record) => (
+        <div className='qty-stepper'>
+          <button
+            type='button'
+            className='qty-btn'
+            onClick={() => decreaseQuantity(record)}>
+            <MinusOutlined />
+          </button>
+          <span className='qty-number'>{record.quantity}</span>
+          <button
+            type='button'
+            className='qty-btn'
+            onClick={() => increaseQuantity(record)}>
+            <PlusOutlined />
+          </button>
+        </div>
+      ),
+    },
+    {
+      title: 'Total',
+      render: (_, record) => (
+        <span style={{ fontWeight: '700', color: '#059669' }}>
+          ${(record.price * record.quantity).toFixed(2)}
+        </span>
+      ),
+    },
+    {
+      title: 'Action',
+      render: (_, record) => (
+        <Popconfirm
+          title='Remove item from cart?'
+          onConfirm={() =>
+            dispatch({ type: 'deleteFromCart', payload: record })
+          }
+          okText='Yes'
+          cancelText='No'>
+          <Button
+            type='text'
+            danger
+            icon={<DeleteOutlined />}
+            style={{ borderRadius: '8px' }}
+          />
+        </Popconfirm>
+      ),
+    },
+  ];
+
   const onFinish = (values) => {
+    dispatch({ type: 'showLoading' });
+    const user = JSON.parse(localStorage.getItem('pos-user') || '{}');
     const reqObject = {
       ...values,
       subTotal,
       cartItems,
-      tax: Number(((subTotal / 100) * 10).toFixed(2)),
-      totalAmount: Number((subTotal + (subTotal / 100) * 10).toFixed(2)),
-      userId: JSON.parse(localStorage.getItem('pos-user'))._id,
+      tax,
+      totalAmount: grandTotal,
+      userId: user?._id || 'guest',
     };
+
     axios
-      .post(
-        '/api/bill/charge-bill',
-        reqObject
-      )
+      .post('/api/bill/charge-bill', reqObject)
       .then(() => {
-        const notify = () => toast.success('bill charged Successfully!');
-        notify();
-        Navigate('/bills');
+        dispatch({ type: 'hideLoading' });
+        toast.success('Bill generated and saved successfully!');
+        setBillChargeModel(false);
+        // Clear cart
+        localStorage.removeItem('cartItems');
+        dispatch({ type: 'emptyCart' });
+        navigate('/bills');
       })
-      .catch(() => {
-        const notify = () => toast.error('Something went wrong');
-        notify();
+      .catch((err) => {
+        dispatch({ type: 'hideLoading' });
+        toast.error(
+          err.response?.data?.message || 'Failed to charge bill. Try again.'
+        );
       });
   };
 
   return (
-    <DefaultLaout>
-      <h4 className='my-6'>Cart</h4>
-      <Table
-        columns={column}
-        dataSource={cartItems}
-        bordered
-      />
-      <hr />
-      <div className='d-flex justify-content-end flex-column align-items-end'>
-        <div className='subtotal'>
-          <h3>
-            Sub Total: <b>{subTotal} $/-</b>
-          </h3>
+    <DefaultLayout>
+      {/* Header */}
+      <div className='page-header-container'>
+        <div className='page-title-group'>
+          <h2>Order Checkout & Cart</h2>
+          <p>Review items, adjust quantities, and generate customer bill</p>
         </div>
+
         <Button
-          type='primary'
-          onClick={() => setBillChargeModel(true)}>
-          CHARGE BILL
+          type='default'
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/home')}
+          style={{ borderRadius: '8px' }}>
+          Continue Shopping
         </Button>
       </div>
+
+      {cartItems && cartItems.length > 0 ? (
+        <div className='cart-container'>
+          {/* Left: Cart Items (Table on desktop, Touch Cards on mobile) */}
+          <div>
+            {!isMobile ? (
+              <Table
+                columns={desktopColumns}
+                dataSource={cartItems}
+                rowKey={(record) => record._id || record.name}
+                pagination={false}
+              />
+            ) : (
+              <div className='mobile-cart-list'>
+                {cartItems.map((item) => (
+                  <div key={item._id || item.name} className='mobile-cart-card'>
+                    <div className='mobile-cart-card-top'>
+                      <div className='mobile-cart-card-left'>
+                        <img
+                          src={
+                            item.image ||
+                            'https://images.unsplash.com/photo-1542838132-92c53300491e?w=100'
+                          }
+                          alt={item.name}
+                          className='mobile-cart-img'
+                        />
+                        <div className='mobile-cart-info'>
+                          <div className='mobile-cart-name' title={item.name}>
+                            {item.name}
+                          </div>
+                          <div className='mobile-cart-unit-price'>
+                            ${Number(item.price).toFixed(2)} / unit
+                          </div>
+                        </div>
+                      </div>
+
+                      <Popconfirm
+                        title='Remove item from cart?'
+                        onConfirm={() =>
+                          dispatch({ type: 'deleteFromCart', payload: item })
+                        }
+                        okText='Yes'
+                        cancelText='No'>
+                        <Button
+                          type='text'
+                          danger
+                          icon={<DeleteOutlined />}
+                          style={{ borderRadius: '6px' }}
+                        />
+                      </Popconfirm>
+                    </div>
+
+                    <div className='mobile-cart-card-bottom'>
+                      <div className='qty-stepper'>
+                        <button
+                          type='button'
+                          className='qty-btn'
+                          onClick={() => decreaseQuantity(item)}>
+                          <MinusOutlined />
+                        </button>
+                        <span className='qty-number'>{item.quantity}</span>
+                        <button
+                          type='button'
+                          className='qty-btn'
+                          onClick={() => increaseQuantity(item)}>
+                          <PlusOutlined />
+                        </button>
+                      </div>
+
+                      <div className='mobile-cart-line-total'>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right: Summary Card */}
+          <div className='cart-summary-card'>
+            <h3>Order Summary</h3>
+
+            <div className='summary-row'>
+              <span>Items Total ({cartItems.length} items)</span>
+              <span>${subTotal.toFixed(2)}</span>
+            </div>
+
+            <div className='summary-row'>
+              <span>Tax / VAT (10%)</span>
+              <span>${tax.toFixed(2)}</span>
+            </div>
+
+            <div className='summary-row total'>
+              <span>Grand Total</span>
+              <span>${grandTotal.toFixed(2)}</span>
+            </div>
+
+            <Button
+              type='primary'
+              className='cart-charge-btn'
+              onClick={() => setBillChargeModel(true)}
+              icon={<CheckCircleOutlined />}>
+              Proceed to Charge (${grandTotal.toFixed(2)})
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            background: '#ffffff',
+            padding: '60px 20px',
+            borderRadius: '16px',
+            textAlign: 'center',
+            border: '1px solid #e2e8f0',
+          }}>
+          <Empty
+            image={
+              <ShoppingCartOutlined
+                style={{ fontSize: '56px', color: '#cbd5e1' }}
+              />
+            }
+            description={
+              <div>
+                <h3 style={{ margin: '14px 0 4px', color: '#1e293b', fontSize: '18px' }}>
+                  Your cart is empty
+                </h3>
+                <p style={{ color: '#64748b', fontSize: '13px' }}>
+                  Looks like you haven't added any products to your cart yet.
+                </p>
+              </div>
+            }>
+            <Button
+              type='primary'
+              size='large'
+              onClick={() => navigate('/home')}
+              style={{
+                borderRadius: '8px',
+                background: '#1890ff',
+                marginTop: '10px',
+              }}>
+              Browse Products
+            </Button>
+          </Empty>
+        </div>
+      )}
+
+      {/* Charge Bill Modal */}
       <Modal
-        title='Charge Bill'
-        visible={billChargeModel}
+        title={
+          <div style={{ fontSize: '18px', fontWeight: '700' }}>
+            Charge & Generate Bill
+          </div>
+        }
+        open={billChargeModel}
         onCancel={() => setBillChargeModel(false)}
-        footer={false}>
-        <Form
-          layout='vertical'
-          onFinish={onFinish}>
+        footer={false}
+        width={isMobile ? '95%' : 500}
+        destroyOnClose>
+        <Form layout='vertical' onFinish={onFinish}>
           <Form.Item
-            name={'customerName'}
-            label='Customer Name'>
-            <Input />
+            name='customerName'
+            label='Customer Name'
+            rules={[
+              { required: true, message: 'Please enter customer name!' },
+            ]}>
+            <Input placeholder='e.g. John Doe' size='large' />
           </Form.Item>
+
           <Form.Item
-            name={'customerPhoneNumber'}
-            label='Phone Number'>
-            <Input />
+            name='customerPhoneNumber'
+            label='Phone Number'
+            rules={[
+              { required: true, message: 'Please enter phone number!' },
+            ]}>
+            <Input placeholder='e.g. +880 1700-000000' size='large' />
           </Form.Item>
+
           <Form.Item
             name='paymentMode'
-            label='Payment Mode'>
-            <Select>
-              <Select.Option value='cash'>Cash</Select.Option>
-              <Select.Option value='card'>Card</Select.Option>
+            label='Payment Method'
+            initialValue='cash'
+            rules={[
+              { required: true, message: 'Please select payment mode!' },
+            ]}>
+            <Select size='large'>
+              <Select.Option value='cash'>
+                <DollarCircleOutlined style={{ marginRight: '8px' }} /> Cash
+              </Select.Option>
+              <Select.Option value='card'>
+                <CreditCardOutlined style={{ marginRight: '8px' }} /> Card / Online
+              </Select.Option>
             </Select>
           </Form.Item>
-          <div className='charge-bill-amount'>
-            <h5>
-              SubTotal: <b>{subTotal} $/-</b>
-            </h5>
-            <h5>
-              Tax: <b>{((subTotal / 100) * 10).toFixed(2)} $/-</b>
-            </h5>
-            <hr />
-            <h2>
-              Grand Total:{' '}
-              <b>{(subTotal + (subTotal / 100) * 10).toFixed(2)}</b>
-            </h2>
+
+          <div
+            style={{
+              background: '#f8fafc',
+              padding: '14px 16px',
+              borderRadius: '10px',
+              marginBottom: '20px',
+              border: '1px solid #e2e8f0',
+            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '6px',
+                fontSize: '13px',
+                color: '#64748b',
+              }}>
+              <span>Subtotal:</span>
+              <span style={{ fontWeight: '600' }}>${subTotal.toFixed(2)}</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '6px',
+                fontSize: '13px',
+                color: '#64748b',
+              }}>
+              <span>Tax (10%):</span>
+              <span style={{ fontWeight: '600' }}>${tax.toFixed(2)}</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '16px',
+                fontWeight: '800',
+                color: '#0f172a',
+                borderTop: '1px dashed #cbd5e1',
+                paddingTop: '8px',
+              }}>
+              <span>Total Payable:</span>
+              <span style={{ color: '#059669' }}>${grandTotal.toFixed(2)}</span>
+            </div>
           </div>
-          <div className='d-flex justify-content-end'>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <Button onClick={() => setBillChargeModel(false)}>Cancel</Button>
             <Button
               htmlType='submit'
-              type='primary'>
-              GENERATE BILL
+              type='primary'
+              style={{ background: '#10b981', borderColor: '#10b981' }}>
+              Confirm & Generate Bill
             </Button>
           </div>
         </Form>
       </Modal>
-    </DefaultLaout>
+    </DefaultLayout>
   );
 };
 

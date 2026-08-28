@@ -1,5 +1,13 @@
-import { Col, Row } from 'antd';
 import { Button, Form, Input } from 'antd';
+import {
+  IdcardOutlined,
+  LockOutlined,
+  ShopOutlined,
+  ThunderboltOutlined,
+  DatabaseOutlined,
+  SafetyCertificateOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 import '../../resursers/authentication.css';
 import { Link, useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
@@ -9,69 +17,127 @@ import { toast } from 'react-toastify';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const onFinish = (values) => {
     dispatch({ type: 'showLoading' });
     axios
       .post('/api/users/login', values)
       .then((res) => {
         dispatch({ type: 'hideLoading' });
-        const notify = () => toast.success('Login Successfully!');
-        notify();
-        console.log(res.data);
+        toast.success('Login Successfully!');
         localStorage.setItem('pos-user', JSON.stringify(res.data));
         navigate('/home');
       })
-      .catch(() => {
+      .catch((err) => {
         dispatch({ type: 'hideLoading' });
-        const notify = () => toast.error('Something went wrong');
-        notify();
+        const errorMsg =
+          err.response?.data?.message || 'Login failed. Please check your credentials.';
+        toast.error(errorMsg);
       });
   };
 
   return (
     <div className='authentication'>
-      <Row>
-        <Col
-          lg={8}
-          xs={22}>
+      <div className='auth-card'>
+        {/* Left Hero Section */}
+        <div className='auth-hero'>
+          <div className='auth-brand-logo'>
+            <div className='auth-logo-icon'>
+              <ShopOutlined />
+            </div>
+            <h2>
+              Fresh<span>POS</span>
+            </h2>
+          </div>
+
+          <div className='auth-hero-content'>
+            <div className='auth-hero-title'>
+              Manage Your Store Smarter & Faster.
+            </div>
+            <div className='auth-hero-desc'>
+              Streamline billing, keep real-time track of inventory, and deliver seamless customer checkout experiences.
+            </div>
+
+            <div className='auth-features-list'>
+              <div className='auth-feature-item'>
+                <div className='auth-feature-icon'>
+                  <ThunderboltOutlined />
+                </div>
+                <span>Lightning-fast point of sale billing</span>
+              </div>
+              <div className='auth-feature-item'>
+                <div className='auth-feature-icon'>
+                  <DatabaseOutlined />
+                </div>
+                <span>Real-time inventory & stock tracking</span>
+              </div>
+              <div className='auth-feature-item'>
+                <div className='auth-feature-icon'>
+                  <SafetyCertificateOutlined />
+                </div>
+                <span>Secure cloud-synced customer records</span>
+              </div>
+            </div>
+          </div>
+
+          <div className='auth-hero-footer'>
+            © {new Date().getFullYear()} FreshPOS. All rights reserved.
+          </div>
+        </div>
+
+        {/* Right Form Section */}
+        <div className='auth-form-wrapper'>
+          <div className='auth-form-header'>
+            <h2>Welcome Back! 👋</h2>
+            <p>Please enter your credentials to access your POS dashboard.</p>
+          </div>
+
           <Form
             layout='vertical'
-            onFinish={(values) => onFinish(values)}>
-            <h1>
-              <b>FreshPOS</b>
-            </h1>
-            <hr />
-            <h3 className='text-center'>Login</h3>
+            onFinish={onFinish}
+            autoComplete='off'>
             <Form.Item
-              name={'userId'}
-              label='User Id'>
-              <Input />
+              name='userId'
+              label='User ID'
+              rules={[
+                { required: true, message: 'Please enter your User ID!' },
+              ]}>
+              <Input
+                prefix={<IdcardOutlined />}
+                placeholder='Enter your user ID'
+                size='large'
+              />
             </Form.Item>
+
             <Form.Item
-              name={'password'}
-              label='Password'>
-              <Input type='password' />
+              name='password'
+              label='Password'
+              rules={[
+                { required: true, message: 'Please enter your password!' },
+              ]}>
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder='Enter your password'
+                size='large'
+              />
             </Form.Item>
-            <div className='d-flex justify-content-end'>
+
+            <div style={{ marginTop: '28px' }}>
               <Button
+                type='primary'
                 htmlType='submit'
-                type='primary'>
-                Login
+                className='auth-submit-btn'>
+                Sign In <ArrowRightOutlined />
               </Button>
             </div>
-            <div className='px-5'>
-              <span>
-                Dont't Registed ? Click here to{' '}
-                <Link
-                  to='/register'
-                  className='text-decoration-none text-primary'>
-                  Register
-                </Link>
-              </span>
+
+            <div className='auth-switch-link'>
+              Don't have an account?
+              <Link to='/register'>Create Account</Link>
             </div>
           </Form>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </div>
   );
 };
