@@ -1,6 +1,6 @@
 import { Button, Form, Input } from 'antd';
 import {
-  IdcardOutlined,
+  MailOutlined,
   LockOutlined,
   ShopOutlined,
   ThunderboltOutlined,
@@ -89,7 +89,7 @@ const Login = () => {
         <div className='auth-form-wrapper'>
           <div className='auth-form-header'>
             <h2>Welcome Back! 👋</h2>
-            <p>Please enter your credentials to access your POS dashboard.</p>
+            <p>Please enter your email and password to access POS.</p>
           </div>
 
           <Form
@@ -97,14 +97,15 @@ const Login = () => {
             onFinish={onFinish}
             autoComplete='off'>
             <Form.Item
-              name='userId'
-              label='User ID'
+              name='email'
+              label='Email Address'
               rules={[
-                { required: true, message: 'Please enter your User ID!' },
+                { required: true, message: 'Please enter your email!' },
+                { type: 'email', message: 'Please enter a valid email address!' },
               ]}>
               <Input
-                prefix={<IdcardOutlined />}
-                placeholder='Enter your user ID'
+                prefix={<MailOutlined />}
+                placeholder='Enter your email address'
                 size='large'
               />
             </Form.Item>

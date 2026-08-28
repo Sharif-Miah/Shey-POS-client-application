@@ -1,7 +1,7 @@
 import { Button, Form, Input } from 'antd';
 import {
   UserOutlined,
-  IdcardOutlined,
+  MailOutlined,
   LockOutlined,
   ShopOutlined,
   ThunderboltOutlined,
@@ -111,15 +111,15 @@ const Register = () => {
             </Form.Item>
 
             <Form.Item
-              name='userId'
-              label='User ID'
+              name='email'
+              label='Email Address'
               rules={[
-                { required: true, message: 'Please enter a User ID!' },
-                { min: 3, message: 'User ID must be at least 3 characters!' },
+                { required: true, message: 'Please enter your email!' },
+                { type: 'email', message: 'Please enter a valid email address!' },
               ]}>
               <Input
-                prefix={<IdcardOutlined />}
-                placeholder='Choose a unique user ID'
+                prefix={<MailOutlined />}
+                placeholder='Enter your email address'
                 size='large'
               />
             </Form.Item>
