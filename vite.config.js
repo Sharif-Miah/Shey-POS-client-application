@@ -8,8 +8,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // target: 'https://shey-pos-server-psi.vercel.app',
-        target: 'http://localhost:3000',
+        target: 'https://shey-pos-server-psi.vercel.app',
+        // target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       },
