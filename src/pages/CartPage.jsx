@@ -175,23 +175,48 @@ const CartPage = () => {
       userId: user?._id || 'guest',
     };
 
-    axios
-      .post('/api/bill/charge-bill', reqObject)
-      .then(() => {
-        dispatch({ type: 'hideLoading' });
-        toast.success('Bill generated and saved successfully!');
-        setBillChargeModel(false);
-        // Clear cart
-        localStorage.removeItem('cartItems');
-        dispatch({ type: 'emptyCart' });
-        navigate('/bills');
-      })
-      .catch((err) => {
-        dispatch({ type: 'hideLoading' });
-        toast.error(
-          err.response?.data?.message || 'Failed to charge bill. Try again.'
-        );
-      });
+    if (values.paymentMode === 'card') {
+      // 💳 Stripe Online Payment
+      localStorage.setItem('pending-stripe-bill', JSON.stringify(reqObject));
+
+      axios
+        .post('/api/bill/create-checkout-session', reqObject)
+        .then((res) => {
+          dispatch({ type: 'hideLoading' });
+          if (res.data?.url) {
+            // Redirect to Stripe Hosted Checkout
+            window.location.href = res.data.url;
+          } else {
+            toast.error('Could not initiate Stripe session. Please try again.');
+          }
+        })
+        .catch((err) => {
+          dispatch({ type: 'hideLoading' });
+          const errorMsg =
+            err.response?.data?.message ||
+            'Stripe payment service error. Please make sure Stripe Secret Key is added to backend.';
+          toast.error(errorMsg);
+        });
+    } else {
+      // 💵 Cash Payment (Direct bill save)
+      axios
+        .post('/api/bill/charge-bill', reqObject)
+        .then(() => {
+          dispatch({ type: 'hideLoading' });
+          toast.success('Bill generated and saved successfully!');
+          setBillChargeModel(false);
+          // Clear cart
+          localStorage.removeItem('cartItems');
+          dispatch({ type: 'emptyCart' });
+          navigate('/bills');
+        })
+        .catch((err) => {
+          dispatch({ type: 'hideLoading' });
+          toast.error(
+            err.response?.data?.message || 'Failed to charge bill. Try again.'
+          );
+        });
+    }
   };
 
   return (

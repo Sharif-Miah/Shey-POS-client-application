@@ -5,6 +5,8 @@ import DefaultLayout from '../components/DefaultLayout';
 import '../resursers/item.css';
 import { Button, Modal, Table, Input, Tag } from 'antd';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import {
   EyeOutlined,
   PrinterOutlined,
@@ -42,7 +44,41 @@ const Bills = () => {
   };
 
   useEffect(() => {
-    getAllBills();
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+      const pendingBillStr = localStorage.getItem('pending-stripe-bill');
+      if (pendingBillStr) {
+        const pendingBill = JSON.parse(pendingBillStr);
+        axios
+          .post('/api/bill/charge-bill', pendingBill)
+          .then(() => {
+            localStorage.removeItem('pending-stripe-bill');
+            localStorage.removeItem('cartItems');
+            dispatch({ type: 'emptyCart' });
+            toast.success('🎉 Stripe Payment Successful & Bill Generated!');
+            getAllBills();
+          })
+          .catch(() => {
+            localStorage.removeItem('pending-stripe-bill');
+            localStorage.removeItem('cartItems');
+            dispatch({ type: 'emptyCart' });
+            toast.success('🎉 Payment Successful!');
+            getAllBills();
+          });
+      } else {
+        localStorage.removeItem('cartItems');
+        dispatch({ type: 'emptyCart' });
+        toast.success('🎉 Payment Successful!');
+        getAllBills();
+      }
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (urlParams.get('payment') === 'cancelled') {
+      toast.info('Payment was cancelled.');
+      window.history.replaceState({}, '', window.location.pathname);
+      getAllBills();
+    } else {
+      getAllBills();
+    }
   }, []);
 
   const handlePrint = useReactToPrint({
