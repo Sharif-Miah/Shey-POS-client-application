@@ -7,6 +7,7 @@ import {
   DatabaseOutlined,
   SafetyCertificateOutlined,
   ArrowRightOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import '../../resursers/authentication.css';
 import { Link, useNavigate } from 'react-router';
@@ -76,6 +77,12 @@ const Login = () => {
                   <SafetyCertificateOutlined />
                 </div>
                 <span>Secure cloud-synced customer records</span>
+              </div>
+              <div className='auth-feature-item'>
+                <div className='auth-feature-icon'>
+                  <BarChartOutlined />
+                </div>
+                <span>Automated daily sales & revenue reports</span>
               </div>
             </div>
           </div>

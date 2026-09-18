@@ -8,6 +8,7 @@ import {
   DatabaseOutlined,
   SafetyCertificateOutlined,
   UserAddOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import '../../resursers/authentication.css';
 import { Link, useNavigate } from 'react-router';
@@ -76,6 +77,12 @@ const Register = () => {
                   <SafetyCertificateOutlined />
                 </div>
                 <span>Role-based access & secure user accounts</span>
+              </div>
+              <div className='auth-feature-item'>
+                <div className='auth-feature-icon'>
+                  <BarChartOutlined />
+                </div>
+                <span>Automated daily sales & revenue reports</span>
               </div>
             </div>
           </div>
