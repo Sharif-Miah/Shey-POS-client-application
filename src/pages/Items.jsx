@@ -11,6 +11,7 @@ import {
   Table,
   Tag,
   Popconfirm,
+  Tooltip,
 } from 'antd';
 import { useDispatch } from 'react-redux';
 import {
@@ -20,6 +21,10 @@ import {
   SearchOutlined,
   AppstoreOutlined,
   ShoppingOutlined,
+  BarcodeOutlined,
+  WarningOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 
@@ -78,18 +83,37 @@ const ItemsPage = () => {
   const openAddModal = () => {
     setEditingItem(null);
     form.resetFields();
+    form.setFieldsValue({
+      category: 'vegetables',
+      stock: 50,
+      lowStockThreshold: 5,
+    });
     setAddEditModalVisibility(true);
   };
 
   const openEditModal = (record) => {
     setEditingItem(record);
-    form.setFieldsValue(record);
+    form.setFieldsValue({
+      ...record,
+      stock: record.stock !== undefined ? record.stock : 0,
+      lowStockThreshold: record.lowStockThreshold ?? 5,
+      barcode: record.barcode ?? '',
+    });
     setAddEditModalVisibility(true);
+  };
+
+  // Helper to generate a random 12-digit barcode
+  const handleGenerateBarcode = () => {
+    const randomCode =
+      '890' + Math.floor(100000000 + Math.random() * 900000000).toString();
+    form.setFieldsValue({ barcode: randomCode });
+    toast.info(`Generated barcode: ${randomCode}`);
   };
 
   const filteredData = (itemsData || []).filter((item) =>
     item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.barcode && item.barcode.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const columns = [
@@ -122,6 +146,34 @@ const ItemsPage = () => {
       ),
     },
     {
+      title: 'Barcode',
+      dataIndex: 'barcode',
+      render: (barcode) =>
+        barcode ? (
+          <Tooltip title='Copy Barcode'>
+            <Tag
+              icon={<BarcodeOutlined />}
+              onClick={() => {
+                navigator.clipboard.writeText(barcode);
+                toast.success('Barcode copied!');
+              }}
+              style={{
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                cursor: 'pointer',
+                background: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '6px',
+                padding: '2px 8px',
+              }}>
+              {barcode}
+            </Tag>
+          </Tooltip>
+        ) : (
+          <span style={{ color: '#94a3b8', fontSize: '12px' }}>No Barcode</span>
+        ),
+    },
+    {
       title: 'Category',
       dataIndex: 'category',
       render: (category) => {
@@ -144,6 +196,45 @@ const ItemsPage = () => {
           ${Number(price).toFixed(2)}
         </span>
       ),
+    },
+    {
+      title: 'Stock Status',
+      dataIndex: 'stock',
+      render: (stock, record) => {
+        const currentStock = typeof stock === 'number' ? stock : 0;
+        const threshold = record.lowStockThreshold || 5;
+
+        if (currentStock <= 0) {
+          return (
+            <Tag
+              icon={<CloseCircleOutlined />}
+              color='error'
+              style={{ borderRadius: '6px', fontWeight: '600' }}>
+              Out of Stock (0)
+            </Tag>
+          );
+        }
+
+        if (currentStock <= threshold) {
+          return (
+            <Tag
+              icon={<WarningOutlined />}
+              color='warning'
+              style={{ borderRadius: '6px', fontWeight: '600' }}>
+              Low Stock ({currentStock})
+            </Tag>
+          );
+        }
+
+        return (
+          <Tag
+            icon={<CheckCircleOutlined />}
+            color='success'
+            style={{ borderRadius: '6px', fontWeight: '600' }}>
+            In Stock ({currentStock})
+          </Tag>
+        );
+      },
     },
     {
       title: 'Action',
@@ -178,8 +269,11 @@ const ItemsPage = () => {
     dispatch({ type: 'showLoading' });
     const endpoint =
       editingItem === null ? '/api/items/add-item' : '/api/items/edit-item';
-    const payload =
-      editingItem === null ? value : { ...value, itemId: editingItem._id };
+    const payload = {
+      ...(editingItem === null ? value : { ...value, itemId: editingItem._id }),
+      stock: Number(value.stock) || 0,
+      lowStockThreshold: Number(value.lowStockThreshold) || 5,
+    };
 
     try {
       const response = await fetch(endpoint, {
@@ -211,6 +305,15 @@ const ItemsPage = () => {
 
   // Stats calculation
   const totalCategories = new Set(itemsData.map((i) => i.category)).size;
+  const lowStockCount = itemsData.filter(
+    (i) =>
+      typeof i.stock === 'number' &&
+      i.stock > 0 &&
+      i.stock <= (i.lowStockThreshold || 5)
+  ).length;
+  const outOfStockCount = itemsData.filter(
+    (i) => typeof i.stock === 'number' && i.stock <= 0
+  ).length;
 
   return (
     <DefaultLayout>
@@ -218,7 +321,7 @@ const ItemsPage = () => {
       <div className='page-header-container'>
         <div className='page-title-group'>
           <h2>Product & Inventory Management</h2>
-          <p>Create, update, or remove store products and stock listings</p>
+          <p>Create, update barcode, or manage real-time stock levels</p>
         </div>
 
         <Button
@@ -256,12 +359,32 @@ const ItemsPage = () => {
             <p>Active Categories</p>
           </div>
         </div>
+
+        <div className='stat-card'>
+          <div className='stat-icon' style={{ background: '#fffbeb', color: '#f59e0b' }}>
+            <WarningOutlined />
+          </div>
+          <div className='stat-info'>
+            <h4 style={{ color: '#d97706' }}>{lowStockCount}</h4>
+            <p>Low Stock Items</p>
+          </div>
+        </div>
+
+        <div className='stat-card'>
+          <div className='stat-icon' style={{ background: '#fef2f2', color: '#ef4444' }}>
+            <CloseCircleOutlined />
+          </div>
+          <div className='stat-info'>
+            <h4 style={{ color: '#dc2626' }}>{outOfStockCount}</h4>
+            <p>Out of Stock</p>
+          </div>
+        </div>
       </div>
 
       {/* Search & Filter Bar */}
-      <div style={{ marginBottom: '16px', maxWidth: '340px', width: '100%' }}>
+      <div style={{ marginBottom: '16px', maxWidth: '360px', width: '100%' }}>
         <Input
-          placeholder='Search items or category...'
+          placeholder='Search name, category, or barcode...'
           prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -277,7 +400,7 @@ const ItemsPage = () => {
         dataSource={filteredData}
         rowKey='_id'
         pagination={{ pageSize: 8 }}
-        scroll={{ x: 600 }}
+        scroll={{ x: 750 }}
       />
 
       {/* Add / Edit Modal */}
@@ -296,7 +419,13 @@ const ItemsPage = () => {
         destroyOnClose>
         <Form
           form={form}
-          initialValues={editingItem || { category: 'vegetables' }}
+          initialValues={
+            editingItem || {
+              category: 'vegetables',
+              stock: 50,
+              lowStockThreshold: 5,
+            }
+          }
           layout='vertical'
           onFinish={onFinish}>
           <Form.Item
@@ -305,6 +434,61 @@ const ItemsPage = () => {
             rules={[{ required: true, message: 'Please enter item name!' }]}>
             <Input placeholder='e.g. Fresh Red Apple' size='large' />
           </Form.Item>
+
+          {/* Barcode with Auto-Generate Helper */}
+          <Form.Item
+            name='barcode'
+            label={
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                }}>
+                <span>Product Barcode (EAN / UPC)</span>
+                <Button
+                  type='link'
+                  size='small'
+                  icon={<BarcodeOutlined />}
+                  onClick={handleGenerateBarcode}
+                  style={{ padding: 0, height: 'auto', fontWeight: '500' }}>
+                  Generate Random
+                </Button>
+              </div>
+            }>
+            <Input
+              placeholder='e.g. 890123456789 (Scan or type)'
+              prefix={<BarcodeOutlined style={{ color: '#94a3b8' }} />}
+              size='large'
+            />
+          </Form.Item>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <Form.Item
+              name='stock'
+              label='Stock Quantity'
+              rules={[{ required: true, message: 'Please enter stock quantity!' }]}>
+              <Input
+                type='number'
+                min='0'
+                placeholder='e.g. 50'
+                size='large'
+              />
+            </Form.Item>
+
+            <Form.Item
+              name='lowStockThreshold'
+              label='Low Stock Alert Level'
+              rules={[{ required: true, message: 'Alert threshold required!' }]}>
+              <Input
+                type='number'
+                min='1'
+                placeholder='e.g. 5'
+                size='large'
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item
             name='price'
@@ -331,7 +515,13 @@ const ItemsPage = () => {
             </Select>
           </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '10px',
+              marginTop: '24px',
+            }}>
             <Button
               onClick={() => {
                 setEditingItem(null);

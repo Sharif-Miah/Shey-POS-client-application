@@ -45,6 +45,15 @@ const CartPage = () => {
   }, []);
 
   const increaseQuantity = (record) => {
+    if (
+      typeof record.stock === 'number' &&
+      record.quantity >= record.stock
+    ) {
+      toast.warning(
+        `Cannot add more. Available stock limit is ${record.stock} units for ${record.name}.`
+      );
+      return;
+    }
     dispatch({
       type: 'updatedCart',
       payload: { ...record, quantity: record.quantity + 1 },
@@ -95,11 +104,22 @@ const CartPage = () => {
           />
           <div>
             <div style={{ fontWeight: '600', color: '#0f172a' }}>{text}</div>
-            {record.category && (
-              <Tag color='blue' style={{ fontSize: '11px', marginTop: '2px' }}>
-                {record.category}
-              </Tag>
-            )}
+            <div style={{ display: 'flex', gap: '4px', marginTop: '2px', flexWrap: 'wrap' }}>
+              {record.category && (
+                <Tag color='blue' style={{ fontSize: '11px', margin: 0 }}>
+                  {record.category}
+                </Tag>
+              )}
+              {typeof record.stock === 'number' && (
+                <Tag
+                  color={record.quantity >= record.stock ? 'error' : 'default'}
+                  style={{ fontSize: '11px', margin: 0 }}>
+                  {record.quantity >= record.stock
+                    ? `Max Stock (${record.stock})`
+                    : `Stock: ${record.stock}`}
+                </Tag>
+              )}
+            </div>
           </div>
         </div>
       ),
@@ -116,23 +136,29 @@ const CartPage = () => {
     {
       title: 'Quantity',
       dataIndex: 'quantity',
-      render: (_, record) => (
-        <div className='qty-stepper'>
-          <button
-            type='button'
-            className='qty-btn'
-            onClick={() => decreaseQuantity(record)}>
-            <MinusOutlined />
-          </button>
-          <span className='qty-number'>{record.quantity}</span>
-          <button
-            type='button'
-            className='qty-btn'
-            onClick={() => increaseQuantity(record)}>
-            <PlusOutlined />
-          </button>
-        </div>
-      ),
+      render: (_, record) => {
+        const isMaxStock =
+          typeof record.stock === 'number' && record.quantity >= record.stock;
+        return (
+          <div className='qty-stepper'>
+            <button
+              type='button'
+              className='qty-btn'
+              onClick={() => decreaseQuantity(record)}>
+              <MinusOutlined />
+            </button>
+            <span className='qty-number'>{record.quantity}</span>
+            <button
+              type='button'
+              className='qty-btn'
+              disabled={isMaxStock}
+              onClick={() => increaseQuantity(record)}
+              style={isMaxStock ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
+              <PlusOutlined />
+            </button>
+          </div>
+        );
+      },
     },
     {
       title: 'Total',
@@ -300,7 +326,17 @@ const CartPage = () => {
                         <button
                           type='button'
                           className='qty-btn'
-                          onClick={() => increaseQuantity(item)}>
+                          disabled={
+                            typeof item.stock === 'number' &&
+                            item.quantity >= item.stock
+                          }
+                          onClick={() => increaseQuantity(item)}
+                          style={
+                            typeof item.stock === 'number' &&
+                            item.quantity >= item.stock
+                              ? { opacity: 0.5, cursor: 'not-allowed' }
+                              : {}
+                          }>
                           <PlusOutlined />
                         </button>
                       </div>
