@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DefaultLayout from '../components/DefaultLayout';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import '../resursers/item.css';
 import {
   Button,
@@ -12,6 +12,8 @@ import {
   Tag,
   Popconfirm,
   Tooltip,
+  Divider,
+  Space,
 } from 'antd';
 import { useDispatch } from 'react-redux';
 import {
@@ -33,8 +35,38 @@ const ItemsPage = () => {
   const [addEditModalVisibility, setAddEditModalVisibility] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [customCategories, setCustomCategories] = useState([]);
+  const [newCatInput, setNewCatInput] = useState('');
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+
+  // Derive unique categories from itemsData + defaults + custom added
+  const availableCategories = useMemo(() => {
+    const defaultCats = ['fruits', 'vegetables', 'meat'];
+    const catSet = new Set([...defaultCats, ...customCategories]);
+    (itemsData || []).forEach((item) => {
+      if (item.category && item.category.trim()) {
+        catSet.add(item.category.trim().toLowerCase());
+      }
+    });
+    return Array.from(catSet);
+  }, [itemsData, customCategories]);
+
+  // Handler to add a new custom category on-the-fly
+  const handleAddNewCategory = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const trimmed = newCatInput.trim().toLowerCase();
+    if (!trimmed) return;
+    if (!availableCategories.includes(trimmed)) {
+      setCustomCategories((prev) => [...prev, trimmed]);
+    }
+    form.setFieldsValue({ category: trimmed });
+    setNewCatInput('');
+    toast.success(`Category "${trimmed}" added & selected!`);
+  };
 
   const showAllItems = () => {
     dispatch({ type: 'showLoading' });
@@ -177,10 +209,23 @@ const ItemsPage = () => {
       title: 'Category',
       dataIndex: 'category',
       render: (category) => {
+        const cat = (category || 'general').toLowerCase();
         let color = 'geekblue';
-        if (category === 'fruits') color = 'orange';
-        if (category === 'vegetables') color = 'green';
-        if (category === 'meat') color = 'volcano';
+        if (cat === 'fruits') color = 'orange';
+        else if (cat === 'vegetables') color = 'green';
+        else if (cat === 'meat') color = 'volcano';
+        else if (cat === 'dairy' || cat === 'milk') color = 'blue';
+        else if (cat === 'beverages' || cat === 'drinks') color = 'cyan';
+        else if (cat === 'bakery' || cat === 'bread') color = 'gold';
+        else if (cat === 'snacks') color = 'purple';
+        else if (cat === 'fish') color = 'blue';
+        else if (cat === 'spices') color = 'magenta';
+        else {
+          const colors = ['magenta', 'cyan', 'gold', 'purple', 'lime', 'geekblue'];
+          let hash = 0;
+          for (let i = 0; i < cat.length; i++) hash = cat.charCodeAt(i) + ((hash << 5) - hash);
+          color = colors[Math.abs(hash) % colors.length];
+        }
         return (
           <Tag color={color} style={{ textTransform: 'capitalize', fontWeight: '600' }}>
             {category || 'General'}
@@ -507,12 +552,63 @@ const ItemsPage = () => {
           <Form.Item
             name='category'
             label='Category'
-            rules={[{ required: true, message: 'Please select a category!' }]}>
-            <Select size='large'>
-              <Select.Option value='fruits'>🍎 Fruits</Select.Option>
-              <Select.Option value='vegetables'>🥦 Vegetables</Select.Option>
-              <Select.Option value='meat'>🥩 Meat</Select.Option>
-            </Select>
+            rules={[{ required: true, message: 'Please select or add a category!' }]}>
+            <Select
+              size='large'
+              showSearch
+              placeholder='Select category or type new below'
+              filterOption={(input, option) =>
+                (option?.value || '').toLowerCase().includes(input.toLowerCase())
+              }
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Space style={{ padding: '4px 8px 8px', width: '100%' }}>
+                    <Input
+                      placeholder='Add new category name...'
+                      value={newCatInput}
+                      onChange={(e) => setNewCatInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'Enter') {
+                          handleAddNewCategory(e);
+                        }
+                      }}
+                      style={{ flex: 1 }}
+                    />
+                    <Button
+                      type='primary'
+                      icon={<PlusOutlined />}
+                      onClick={handleAddNewCategory}>
+                      Add
+                    </Button>
+                  </Space>
+                </>
+              )}
+              options={availableCategories.map((cat) => {
+                let emoji = '📦 ';
+                if (cat === 'fruits') emoji = '🍎 ';
+                else if (cat === 'vegetables') emoji = '🥦 ';
+                else if (cat === 'meat') emoji = '🥩 ';
+                else if (cat === 'dairy' || cat === 'milk') emoji = '🥛 ';
+                else if (cat === 'beverages' || cat === 'drinks') emoji = '🥤 ';
+                else if (cat === 'bakery' || cat === 'bread') emoji = '🍞 ';
+                else if (cat === 'snacks') emoji = '🍿 ';
+                else if (cat === 'fish') emoji = '🐟 ';
+                else if (cat === 'spices') emoji = '🌶️ ';
+
+                return {
+                  value: cat,
+                  label: (
+                    <span style={{ textTransform: 'capitalize' }}>
+                      {emoji}
+                      {cat}
+                    </span>
+                  ),
+                };
+              })}
+            />
           </Form.Item>
 
           <div

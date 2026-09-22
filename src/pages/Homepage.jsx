@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import DefaultLayout from '../components/DefaultLayout';
 import '../resursers/item.css';
 import { Col, Row, Input, Empty, Tag, Tooltip } from 'antd';
@@ -55,31 +55,62 @@ const Homepage = () => {
     }
   };
 
-  const categories = [
-    {
-      name: 'all',
-      label: 'All Products',
-      isAll: true,
-    },
-    {
-      name: 'fruits',
-      label: 'Fruits',
-      imageUrl:
-        'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=200&auto=format&fit=crop&q=60',
-    },
-    {
-      name: 'vegetables',
-      label: 'Vegetables',
-      imageUrl:
-        'https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=200&auto=format&fit=crop&q=60',
-    },
-    {
-      name: 'meat',
-      label: 'Meat',
-      imageUrl:
-        'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=200&auto=format&fit=crop&q=60',
-    },
-  ];
+  // Known category images for visually rich display
+  const knownCategoryImages = {
+    fruits: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=200&auto=format&fit=crop&q=60',
+    vegetables: 'https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=200&auto=format&fit=crop&q=60',
+    meat: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=200&auto=format&fit=crop&q=60',
+    dairy: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=200&auto=format&fit=crop&q=60',
+    milk: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=200&auto=format&fit=crop&q=60',
+    beverages: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&auto=format&fit=crop&q=60',
+    drinks: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&auto=format&fit=crop&q=60',
+    bakery: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&auto=format&fit=crop&q=60',
+    bread: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&auto=format&fit=crop&q=60',
+    snacks: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=200&auto=format&fit=crop&q=60',
+    fish: 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=200&auto=format&fit=crop&q=60',
+    spices: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=200&auto=format&fit=crop&q=60',
+  };
+
+  // Dynamically compute categories from itemsData
+  const categories = useMemo(() => {
+    const list = [
+      {
+        name: 'all',
+        label: 'All Products',
+        isAll: true,
+      },
+    ];
+
+    const foundCategories = new Set();
+    // Default baseline categories
+    ['fruits', 'vegetables', 'meat'].forEach((cat) => foundCategories.add(cat));
+
+    // Add every category found in the items collection
+    (itemsData || []).forEach((item) => {
+      if (item.category && item.category.trim()) {
+        foundCategories.add(item.category.trim().toLowerCase());
+      }
+    });
+
+    foundCategories.forEach((catName) => {
+      const sampleItem = (itemsData || []).find(
+        (it) => it.category?.trim().toLowerCase() === catName && it.image
+      );
+      const imageUrl =
+        knownCategoryImages[catName] ||
+        sampleItem?.image ||
+        'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&auto=format&fit=crop&q=60';
+      const label = catName.charAt(0).toUpperCase() + catName.slice(1);
+
+      list.push({
+        name: catName,
+        label,
+        imageUrl,
+      });
+    });
+
+    return list;
+  }, [itemsData]);
 
   useEffect(() => {
     dispatch({ type: 'showLoading' });
