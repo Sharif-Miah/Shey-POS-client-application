@@ -82,8 +82,6 @@ const Homepage = () => {
     ];
 
     const foundCategories = new Set();
-    // Default baseline categories
-    ['fruits', 'vegetables', 'meat'].forEach((cat) => foundCategories.add(cat));
 
     // Add every category found in the items collection
     (itemsData || []).forEach((item) => {
@@ -91,6 +89,11 @@ const Homepage = () => {
         foundCategories.add(item.category.trim().toLowerCase());
       }
     });
+
+    // Only if database has no categorized items yet, provide standard starters
+    if (foundCategories.size === 0) {
+      ['fruits', 'vegetables', 'meat'].forEach((cat) => foundCategories.add(cat));
+    }
 
     foundCategories.forEach((catName) => {
       const sampleItem = (itemsData || []).find(
@@ -111,6 +114,16 @@ const Homepage = () => {
 
     return list;
   }, [itemsData]);
+
+  // If active selected category is removed, auto-reset to 'all'
+  useEffect(() => {
+    if (
+      selectedCategory !== 'all' &&
+      !categories.some((c) => c.name === selectedCategory)
+    ) {
+      setSelectedCategory('all');
+    }
+  }, [categories, selectedCategory]);
 
   useEffect(() => {
     dispatch({ type: 'showLoading' });
